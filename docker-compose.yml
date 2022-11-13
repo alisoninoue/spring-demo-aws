@@ -1,36 +1,50 @@
 version: '3.8'
 services:
-  dynamodb-demo-aws:
-    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
-    image: "amazon/dynamodb-local:latest"
-    container_name: dynamodb-demo-aws
-    ports:
-      - "8000:8000"
-    volumes:
-      - "./docker/dynamodb:/home/dynamodblocal/data"
-    working_dir: /home/dynamodblocal
-
   dynamodb-admin-demo-aws:
     image: aaronshaf/dynamodb-admin
     ports:
       - "8001:8001"
     environment:
-      DYNAMO_ENDPOINT: "http://dynamodb-demo-aws:8000"
+      DYNAMO_ENDPOINT: "http://localstack:4566"
       AWS_REGION: "us-east-1"
       AWS_ACCESS_KEY_ID: local
       AWS_SECRET_ACCESS_KEY: local
+    networks:
+      - backend
     depends_on:
-      - dynamodb-demo-aws
+      - localstack
 
-  localstack-demo-aws:
-    image: localstack/localstack:0.13.2
-    environment:
-      - DEFAULT_REGION=us-east-1
-      - EDGE_PORT=4566
-      - SERVICES=sqs
-      #- SQS_PROVIDER=elasticmq
+  localstack:
+    container_name: "${LOCALSTACK_DOCKER_NAME-localstack_cloud}"
+    image: "localstack/localstack:1.2.0"
+    network_mode: bridge
     ports:
-      - '4566:4566'
+      - "127.0.0.1:53:53"                # only required for Pro
+      - "127.0.0.1:53:53/udp"            # only required for Pro
+      - "127.0.0.1:443:443"              # only required for Pro
+      - "127.0.0.1:4510-4530:4510-4530"
+      - "127.0.0.1:4566:4566"
+      - "127.0.0.1:4571:4571"
+    environment:
+      - AWS_DEFAULT_REGION=sa-east-1
+      - AWS_ACCESS_KEY_ID=fakeAccessKeyId
+      - AWS_SECRET_ACCESS_KEY=fakeSecretAccessKey
+      - DEFAULT_REGION=sa-east-1
+      - http_proxy=
+      - https_proxy=
+      - SERVICES=sqs,sns,dynamodb
+      - DEBUG=${DEBUG-}
+      - DATA_DIR=${DATA_DIR-}
+      - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR-}
+      - HOST_TMP_FOLDER=${TMPDIR:-/tmp/}localstack
+      - LOCALSTACK_API_KEY=${LOCALSTACK_API_KEY-}  # only required for Pro
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DISABLE_CORS_CHECKS=1
     volumes:
-      - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
+      - "${TMPDIR:-/tmp}/localstack:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - backend
+
+networks:
+  backend:

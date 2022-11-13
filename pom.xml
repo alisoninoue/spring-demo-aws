@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.2</version>
+        <version>2.7.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>br.com.alison.aws</groupId>
@@ -17,7 +17,7 @@
         <java.version>11</java.version>
         <aws-java-sdk-dynamodb.version>1.12.131</aws-java-sdk-dynamodb.version>
         <spring-data-dynamodb.version>5.2.5</spring-data-dynamodb.version>
-        <spring-cloud-aws-dependencies.version>2.3.3</spring-cloud-aws-dependencies.version>
+        <spring-cloud-aws-dependencies.version>2.4.2</spring-cloud-aws-dependencies.version>
     </properties>
 
     <dependencyManagement>
