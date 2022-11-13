@@ -5,7 +5,7 @@ amazon:
   sqs:
     endpoint: http://localhost:4566/
   dynamodb:
-    endpoint: http://localhost:8000/
+    endpoint: http://localhost:4566/
   aws:
     accesskey: key
     secretkey: key2
