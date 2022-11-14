@@ -16,30 +16,30 @@ services:
 
   localstack:
     container_name: "${LOCALSTACK_DOCKER_NAME-localstack_cloud}"
-    image: "localstack/localstack:1.2.0"
+    image: "localstack/localstack:1.1.0"
     network_mode: bridge
     ports:
-      - "127.0.0.1:53:53"                # only required for Pro
-      - "127.0.0.1:53:53/udp"            # only required for Pro
-      - "127.0.0.1:443:443"              # only required for Pro
       - "127.0.0.1:4510-4530:4510-4530"
       - "127.0.0.1:4566:4566"
       - "127.0.0.1:4571:4571"
     environment:
-      - AWS_DEFAULT_REGION=sa-east-1
+      - AWS_DEFAULT_REGION=us-east-1
       - AWS_ACCESS_KEY_ID=fakeAccessKeyId
       - AWS_SECRET_ACCESS_KEY=fakeSecretAccessKey
       - DEFAULT_REGION=sa-east-1
       - http_proxy=
       - https_proxy=
-      - SERVICES=sqs,sns,dynamodb
+      - SERVICES=sqs,sns,dynamodb,secretsmanager, ssm
       - DEBUG=${DEBUG-}
       - DATA_DIR=${DATA_DIR-}
       - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR-}
       - HOST_TMP_FOLDER=${TMPDIR:-/tmp/}localstack
-      - LOCALSTACK_API_KEY=${LOCALSTACK_API_KEY-}  # only required for Pro
       - DOCKER_HOST=unix:///var/run/docker.sock
       - DISABLE_CORS_CHECKS=1
+      - SKIP_SSL_CERT_DOWNLOAD=1
+      - SKIP_INFRA_DOWNLOADS=1
+      - DISABLE_EVENTS=1
+      - EAGER_SERVICE_LOADING=1
     volumes:
       - "${TMPDIR:-/tmp}/localstack:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
