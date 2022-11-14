@@ -1,9 +1,12 @@
 package br.com.alison.aws.awsdynamodb.configuration;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
 import java.time.Instant;
@@ -36,5 +39,15 @@ public class AwsDemoApplication implements CommandLineRunner {
 		log.info("Java-Version: {}", System.getProperty("java.specification.version"));
 		log.info("Java-Runtime-Version: {}", System.getProperty("java.runtime.version"));
 		log.info("file.encoding: {}", System.getProperty("file.encoding"));
+	}
+
+	@Bean
+	ApplicationRunner applicationRunner(@Value("${password1}") String password1,
+										@Value("${password2}") String password2,
+										@Value("${parameterstore1}") String parameterstore1) {
+		return args -> {
+			log.info("`password` loaded from the AWS Secret Manager: {} {}", password1, password2);
+			log.info("`ssm parameter store` loaded from the AWS SSM: {} ", parameterstore1);
+		};
 	}
 }

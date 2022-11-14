@@ -2,11 +2,37 @@ server:
   port: 8099
 
 amazon:
-  sqs:
-    endpoint: http://localhost:4566/
   dynamodb:
     endpoint: http://localhost:4566/
   aws:
     accesskey: key
     secretkey: key2
     region: us-east-1
+
+cloud:
+  aws:
+    sns:
+      region: us-east-1
+      endpoint: http://localhost:4566/
+    s3:
+      region: us-east-1
+      endpoint: http://localhost:4566/
+    sqs:
+      region: us-east-1
+      endpoint: http://localhost:4566/
+
+spring:
+  application:
+    name: springdemoaws
+  config:
+    import:
+      "aws-secretsmanager:secrets/test1;secrets/test2, 
+       aws-parameterstore:/test/"
+
+aws:
+  paramstore:
+    endpoint: http://localhost:4566/
+  secretsmanager:
+    endpoint: http://localhost:4566/
+
+user: ${password2}
