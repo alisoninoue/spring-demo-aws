@@ -1,3 +1,4 @@
+#!/bin/bash
 export AWS_PAGER=""
 export MSYS2_ARG_CONV_EXCL="*"
 
