@@ -43,6 +43,7 @@ services:
     volumes:
       - "${TMPDIR:-/tmp}/localstack:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./setup_aws.sh:/etc/localstack/init/ready.d/setup_aws.sh"
     networks:
       - backend
 

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v1")
 @RequiredArgsConstructor
-public class PersonRest {
+public class PersonRestController {
 
     private final PersonRegisterUseCase registerUseCase;
     private final PersonDtoToModel converter;
