@@ -16,29 +16,51 @@ aws dynamodb create-table \
   --key-schema AttributeName=cpf,KeyType=HASH \
   --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
 
-printf "deleting main queueu \n"
+printf "deleting main queue \n"
 aws sqs delete-queue \
   --region=us-east-1 \
   --endpoint-url=http://localhost:4566 \
   --queue-url "http://localhost:4566/000000000000/person"
-printf "deleting dlq queueu \n"
+printf "deleting dlq queue \n"
 aws sqs delete-queue \
   --region=us-east-1 \
   --endpoint-url=http://localhost:4566  \
   --queue-url "http://localhost:4566/000000000000/person_dlq"
+printf "deleting queue for subscription to SNS  \n"
+aws sqs delete-queue \
+  --region=us-east-1 \
+  --endpoint-url=http://localhost:4566 \
+  --queue-url "http://localhost:4566/000000000000/personSubSns"
+printf "deleting queue for fraud process  \n"
+aws sqs delete-queue \
+  --region=us-east-1 \
+  --endpoint-url=http://localhost:4566 \
+  --queue-url "http://localhost:4566/000000000000/commandFraudProcessor"
 
-printf "creating dlq queueu \n"
+printf "creating dlq queue \n"
 aws sqs create-queue \
   --region=us-east-1 \
   --endpoint-url=http://localhost:4566  \
   --queue-name person_dlq
 
-printf "creating main queueu with redrive policy \n"
+printf "creating main queue with redrive policy \n"
 aws sqs create-queue \
   --region=us-east-1 \
   --endpoint-url=http://localhost:4566  \
   --queue-name person \
   --attributes '{"RedrivePolicy": "{\"deadLetterTargetArn\": \"arn:aws:sqs:us-east-1:000000000000:person_dlq\",\"maxReceiveCount\": \"2\"}","VisibilityTimeout":"5"}'
+
+printf "creating queue for subscription to SNS  \n"
+aws sqs create-queue \
+  --region=us-east-1 \
+  --endpoint-url=http://localhost:4566  \
+  --queue-name personSubSns
+
+printf "creating queue for fraud process  \n"
+aws sqs create-queue \
+  --region=us-east-1 \
+  --endpoint-url=http://localhost:4566  \
+  --queue-name commandFraudProcessor
 
 printf "sending message \n"
 aws sqs send-message \
@@ -60,6 +82,16 @@ aws sqs get-queue-attributes \
   --region=us-east-1 \
   --endpoint-url=http://localhost:4566  \
   --queue-url "http://localhost:4566/000000000000/person_dlq" \
+  --attribute-names All
+aws sqs get-queue-attributes \
+  --region=us-east-1 \
+  --endpoint-url=http://localhost:4566  \
+  --queue-url "http://localhost:4566/000000000000/personSubSns" \
+  --attribute-names All
+aws sqs get-queue-attributes \
+  --region=us-east-1 \
+  --endpoint-url=http://localhost:4566  \
+  --queue-url "http://localhost:4566/000000000000/commandFraudProcessor" \
   --attribute-names All
 
 #Secrets Manager
@@ -110,3 +142,45 @@ aws ssm get-parameters-by-path \
   --region=us-east-1 \
   --endpoint-url=http://localhost:4566 \
   --path "/test/"
+
+printf "deleting SNS topic \n"
+aws sns delete-topic \
+  --region=us-east-1 \
+  --endpoint-url=http://localhost:4566 \
+  --topic-arn "arn:aws:sns:us-east-1:000000000000:personCreatedTopic"
+
+printf "creating SNS topic \n"
+aws sns create-topic \
+  --region=us-east-1 \
+  --endpoint-url=http://localhost:4566 \
+  --name personCreatedTopic
+
+printf "listing SNS topic \n"
+aws sns list-topics \
+  --region=us-east-1 \
+  --endpoint-url=http://localhost:4566
+
+printf "subscribe HTTP SNS topic \n"
+aws sns subscribe \
+  --region=us-east-1 \
+  --endpoint-url=http://localhost:4566 \
+  --topic-arn "arn:aws:sns:us-east-1:000000000000:personCreatedTopic" \
+  --protocol http \
+  --notification-endpoint http://host.docker.internal:8099/personCreatedTopic
+
+printf "subscribe SQS to SNS topic \n"
+aws sns subscribe \
+  --region=us-east-1 \
+  --endpoint-url=http://localhost:4566 \
+  --topic-arn "arn:aws:sns:us-east-1:000000000000:personCreatedTopic" \
+  --protocol sqs \
+  --notification-endpoint http://localhost:4566/000000000000/personSubSns
+
+aws sns list-subscriptions \
+  --region=us-east-1 \
+  --endpoint-url=http://localhost:4566
+
+aws sns get-topic-attributes \
+  --region=us-east-1 \
+  --endpoint-url=http://localhost:4566 \
+  --topic-arn "arn:aws:sns:us-east-1:000000000000:personCreatedTopic"
