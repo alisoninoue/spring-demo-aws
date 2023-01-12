@@ -160,7 +160,7 @@ aws sns list-topics \
   --region=us-east-1 \
   --endpoint-url=http://localhost:4566
 
-printf "subscribe HTTP SNS topic \n"
+printf "subscribe HTTP SNS topic, the app has to be started and running locally \n"
 aws sns subscribe \
   --region=us-east-1 \
   --endpoint-url=http://localhost:4566 \
