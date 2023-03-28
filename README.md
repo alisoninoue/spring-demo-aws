@@ -3,7 +3,7 @@
 Spring project with SQS and Dynamodb
 
 ```
-docker-compose up -d
+docker-compose -p spring-demo-aws up -d
 ```
 
 # LOCALSTACK
